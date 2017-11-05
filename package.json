@@ -1,0 +1,16 @@
+{
+  "name": "hsl-route-map-poc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.2",
+    "hsl-map-style": "HSLdevcom/hsl-map-style#faf5f9e7b65a1c36399ad4c540b6b11a070db641",
+    "serve": "^6.4.0"
+  }
+}

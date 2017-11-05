@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Get features under the mouse pointer</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.41.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.41.0/mapbox-gl.css' rel='stylesheet' />
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.4/lodash.min.js"></script>
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+</head>
+<body>
+
+<style>
+    #map canvas {
+        cursor: crosshair;
+    }
+    #map .mapboxgl-popup-content {
+      max-height: 200px;
+      overflow: auto;
+    }
+</style>
+<div id='map'></div>
+<script>
+
+const GRAPHQL_URL = 'http://kartat.hsl.fi/jore/graphql';
+
+const ROUTE_QUERY = `
+  query RouteQuery($direction:String!, $routeId: String!, $dateBegin: Date!, $dateEnd: Date!) {
+    data: routeByRouteIdAndDirectionAndDateBeginAndDateEnd(
+      routeId: $routeId,
+      direction: $direction,
+      dateBegin: $dateBegin,
+      dateEnd: $dateEnd
+    ) {
+      destinationFi
+      originFi
+      line {
+        nodes {
+          lineId
+          dateBegin
+          dateEnd
+        }
+      }
+    }
+  }`
+
+const STOP_QUERY = `
+  query StopQuery($stopId:String!) {
+    data: stopByStopId(
+      stopId: $stopId,
+    ) {
+      routes: routeSegmentsByStopId {
+        nodes {
+          routeId
+        }
+      }
+    }
+  }`
+
+const TRUNK_ROUTES = ["550", "560"];
+const RAIL_ROUTE_ID_REGEXP = /^300[12]/;
+const SUBWAY_ROUTE_ID_REGEXP = /^31/;
+
+/**
+ * Returns whether a route id is a so called number variant
+ * @param {String} routeId - Route id
+ * @returns {boolean}
+ */
+function isNumberVariant(routeId) {
+    return /.{5}[0-9]/.test(routeId);
+}
+
+/**
+ * Returns whether a route id is belongs to a rail route
+ * @param {String} routeId - Route id
+ * @returns {boolean}
+ */
+function isRailRoute(routeId) {
+    return RAIL_ROUTE_ID_REGEXP.test(routeId);
+}
+
+/**
+ * Returns whether a route id is belongs to a subway route
+ * @param {String} routeId - Route id
+ * @returns {boolean}
+ */
+function isSubwayRoute(routeId) {
+    return SUBWAY_ROUTE_ID_REGEXP.test(routeId);
+}
+
+/**
+ * Returns whether a route id is belongs to a trunk route
+ * @param {String} routeId - Route id
+ * @returns {String}
+ */
+function isTrunkRoute(routeId) {
+    return TRUNK_ROUTES.includes(routeId);
+}
+
+/**
+ * Returns route id without area code or leading zeros
+ * @param {String} routeId - Route id
+ * @returns {String}
+ */
+function trimRouteId(routeId) {
+    if (isRailRoute(routeId) && isNumberVariant(routeId)) {
+        return routeId.substring(1, 5).replace(RAIL_ROUTE_ID_REGEXP, "");
+    } else if (isRailRoute(routeId)) {
+        return routeId.replace(RAIL_ROUTE_ID_REGEXP, "");
+    } else if (isSubwayRoute(routeId) && isNumberVariant(routeId)) {
+        return routeId.substring(1, 5).replace(SUBWAY_ROUTE_ID_REGEXP, "");
+    } else if (isSubwayRoute(routeId)) {
+        return routeId.replace(SUBWAY_ROUTE_ID_REGEXP, "");
+    } else if (isNumberVariant(routeId)) {
+        // Do not show number variants
+        return routeId.substring(1, 5).replace(/^[0]+/g, "");
+    }
+    return routeId.substring(1).replace(/^[0]+/g, "");
+}
+
+const colorsByMode = {
+    TRUNK: "#ff6319",
+    TRAM: "#00985f",
+    RAIL: "#8c4799",
+    SUBWAY: "#ff6319",
+    BUS: "#007AC9",
+    FERRY: "#00B9E4",
+};
+
+function renderRoute(route) {
+  const line = route.line.nodes[0]
+
+  return `
+    <div>
+      <a href="http://kartat.hsl.fi/kuljettaja/${line.lineId}/${line.dateBegin}/${line.dateEnd}">
+        ${trimRouteId(route.routeId)} ${route.originFi} -> ${route.destinationFi}
+      </a>
+    </div>`
+}
+
+function renderStop(stop) {
+  return `<div>${stop.nameFi} (${stop.shortId}) ${stop.routes.nodes.map(node => trimRouteId(node.routeId)).join(" ")}</div>`
+}
+
+function renderFeature(feature) {
+  return feature.routeId ? renderRoute(feature) : renderStop(feature)
+}
+
+function fetchData(feature) {
+  return fetch(GRAPHQL_URL, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json; charset=utf-8"
+    },
+    body: JSON.stringify({
+      queryName: feature.routeId ? "RouteQuery" : "StopQuery",
+      query: feature.routeId ? ROUTE_QUERY : STOP_QUERY,
+      variables: feature
+    })
+  })
+    .then(res => res.json())
+    .then(res => Object.assign({}, feature, res.data.data))
+}
+
+const map = new mapboxgl.Map({
+  container: "map",
+  center: [24.9384, 60.1699],
+  style: "style.json",
+  zoom: 10
+});
+
+map.on("click", function(e) {
+  Promise.all(
+    _.sortBy(
+      _.uniqBy(
+        map
+          .queryRenderedFeatures(e.point)
+          .filter(feature => ["routes", "stops"].includes(feature.layer.source))
+          .map(feature => feature.properties),
+        JSON.stringify
+      ),
+      ["stopId", "routeId", "direction"]
+    ).map(fetchData)
+  ).then(features => {
+    new mapboxgl.Popup()
+      .setLngLat(e.lngLat)
+      .setHTML(
+        features
+          .map(renderFeature)
+          .join("")
+      )
+      .addTo(map);
+  });
+});
+
+
+</script>
+
+</body>
+</html>
