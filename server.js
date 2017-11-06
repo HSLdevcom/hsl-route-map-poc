@@ -2,7 +2,6 @@ var fs = require("fs");
 var express = require("express");
 
 var style = require("hsl-map-style").generateStyle({
-    sourcesUrl: "http://api.digitransit.fi/map/v1/",
     glyphsUrl: "http://kartat.hsl.fi/",
     components: {
         text_fisv: { enabled: true },

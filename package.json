@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.2",
-    "hsl-map-style": "HSLdevcom/hsl-map-style#faf5f9e7b65a1c36399ad4c540b6b11a070db641",
+    "hsl-map-style": "HSLdevcom/hsl-map-style",
     "serve": "^6.4.0"
   }
 }
