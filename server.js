@@ -17,10 +17,6 @@ var style = require("hsl-map-style").generateStyle({
 var app = express();
 
 app.get("/", function (req, res) {
-    res.redirect("/index.html");
-});
-
-app.get("/index.html", function (req, res) {
     res.set("Content-Type", "text/html");
     var index = fs.readFileSync("index.html", "utf8");
     res.send(index);
