@@ -4,8 +4,8 @@
     <meta charset='utf-8' />
     <title>Get features under the mouse pointer</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.41.0/mapbox-gl.js'></script>
-    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.41.0/mapbox-gl.css' rel='stylesheet' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.css' rel='stylesheet' />
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.4/lodash.min.js"></script>
     <style>
         body { margin:0; padding:0; }
@@ -21,6 +21,31 @@
     #map .mapboxgl-popup-content {
       max-height: 200px;
       overflow: auto;
+    }
+    .search-bar-container {
+      pointer-events: initial;
+      padding: 5px;
+      float: left;
+    }
+    .search-bar-container input {
+      width: 250px;
+      height: 20px;
+      padding: 5px;
+      margin-right: 3px;
+    }
+    .search-bar-container .btn {
+      width: 30px;
+      padding: 6px;
+      background-color: white;
+      text-align: center;
+      border-radius: 3px;
+      cursor: pointer;
+      float: right;
+      height: 21px;
+      margin: 0px;
+      border-style: solid;
+      border-width: 1px;
+      border-color: #d8d8d8;
     }
 </style>
 <div id='map'></div>
@@ -196,6 +221,76 @@ map.on("click", function(e) {
       )
       .addTo(map);
   });
+});
+
+function SearchControl() { }
+
+SearchControl.prototype.onAdd = function(map) {
+    this._map = map;
+    this._container = document.createElement('div');
+    this._container.innerHTML = `
+      <div class='search-bar-container'>
+        <input placeholder='Hae' id='location-search'/>
+        <div class='btn' onclick='search()'>Hae</div>
+      </div>
+    `;
+    return this._container;
+};
+
+SearchControl.prototype.onRemove = function () {
+     this._container.parentNode.removeChild(this._container);
+     this._map = undefined;
+};
+
+var markerList = [];
+
+function clearMarkers () {
+  for (var i = 0; i < markerList.length; i++) {
+    var marker = markerList[i];
+    marker.remove();
+  }
+  markerList.length = 0;
+}
+
+function searchCallback(res) {
+  var result = JSON.parse(res); 
+  if (result.features && result.features.length) {
+    var coordinates = result.features[0].geometry.coordinates;
+
+    map.setCenter(coordinates);
+    map.setZoom(15);
+
+    clearMarkers();
+    markerList.push(new mapboxgl.Marker()
+      .setLngLat(coordinates)
+      .addTo(map));
+  } else {
+    alert('Hakusi ei tuottanut tuloksia');
+  }
+}
+
+map.addControl(new SearchControl());
+
+function search() {
+  var val = document.getElementById('location-search').value;
+  if (val && val.length > 1) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+          searchCallback(xmlHttp.responseText);
+    }
+    var currentCenter = map.getCenter();
+    var url = "http://api.digitransit.fi/geocoding/v1/search?text=" + encodeURIComponent(val) + "&size=1&focus.point.lat=" + currentCenter.lat + "&focus.point.lon=" + currentCenter.lng;
+    xmlHttp.open("GET", encodeURI(url), true);
+    xmlHttp.send(null);
+  }
+}
+
+var elem = document.getElementById('location-search');
+elem.addEventListener('keypress', function(e){
+  if (e.keyCode == 13) {
+    search();
+  }
 });
 
 map.addControl(new mapboxgl.NavigationControl());
