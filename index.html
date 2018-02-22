@@ -280,7 +280,7 @@ function search() {
           searchCallback(xmlHttp.responseText);
     }
     var currentCenter = map.getCenter();
-    var url = "http://api.digitransit.fi/geocoding/v1/search?text=" + encodeURIComponent(val) + "&size=1&focus.point.lat=" + currentCenter.lat + "&focus.point.lon=" + currentCenter.lng;
+    var url = "http://api.digitransit.fi/geocoding/v1/search?text=" + val + "&size=1&focus.point.lat=" + currentCenter.lat + "&focus.point.lon=" + currentCenter.lng;
     xmlHttp.open("GET", encodeURI(url), true);
     xmlHttp.send(null);
   }
