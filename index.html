@@ -51,7 +51,7 @@
 <div id='map'></div>
 <script>
 
-const GRAPHQL_URL = 'http://kartat.hsl.fi/jore/graphql';
+const GRAPHQL_URL = 'https://kartat.hsldev.com/jore/graphql';
 
 const ROUTE_QUERY = `
   query RouteQuery($direction:String!, $routeId: String!, $dateBegin: Date!, $dateEnd: Date!) {
@@ -161,7 +161,7 @@ function renderRoute(route) {
 
   return `
     <div>
-      <a href="http://kartat.hsl.fi/kuljettaja/${line.lineId}/${line.dateBegin}/${line.dateEnd}">
+      <a href="https://kartat.hsldev.com/kuljettaja/${line.lineId}/${line.dateBegin}/${line.dateEnd}">
         ${trimRouteId(route.routeId)} ${route.originFi} -> ${route.destinationFi}
       </a>
     </div>`
@@ -280,7 +280,7 @@ function search() {
           searchCallback(xmlHttp.responseText);
     }
     var currentCenter = map.getCenter();
-    var url = "http://api.digitransit.fi/geocoding/v1/search?text=" + val + "&size=1&focus.point.lat=" + currentCenter.lat + "&focus.point.lon=" + currentCenter.lng;
+    var url = "https://api.digitransit.fi/geocoding/v1/search?text=" + val + "&size=1&focus.point.lat=" + currentCenter.lat + "&focus.point.lon=" + currentCenter.lng;
     xmlHttp.open("GET", encodeURI(url), true);
     xmlHttp.send(null);
   }

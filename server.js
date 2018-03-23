@@ -2,7 +2,7 @@ var fs = require("fs");
 var express = require("express");
 
 var style = require("hsl-map-style").generateStyle({
-    glyphsUrl: "http://kartat.hsl.fi/",
+    glyphsUrl: "https://kartat.hsldev.com/",
     components: {
         text_fisv: { enabled: true },
         routes: { enabled: true },
