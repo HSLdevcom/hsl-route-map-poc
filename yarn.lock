@@ -444,9 +444,9 @@ has-flag@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/has-flag/-/has-flag-2.0.0.tgz#e8207af1cc7b30d446cc70b734b5e8be18f88d51"
 
-hsl-map-style@HSLdevcom/hsl-map-style:
-  version "1.0.0"
-  resolved "https://codeload.github.com/HSLdevcom/hsl-map-style/tar.gz/d640b1f7656df1e594dbb0c897de4d877ed588fb"
+"hsl-map-style@github:hsldevcom/hsl-map-style#d53dc884676bbd40c933d46946eac10140152057":
+  version "1.0.2"
+  resolved "https://codeload.github.com/HSLdevcom/hsl-map-style/tar.gz/d53dc884676bbd40c933d46946eac10140152057"
   dependencies:
     lodash "^4.17.4"
 
