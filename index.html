@@ -269,7 +269,7 @@ function searchCallback(res) {
   }
 }
 
-map.addControl(new SearchControl());
+map.addControl(new SearchControl(), 'top-left');
 
 function search() {
   var val = document.getElementById('location-search').value;
@@ -293,7 +293,7 @@ elem.addEventListener('keypress', function(e){
   }
 });
 
-map.addControl(new mapboxgl.NavigationControl());
+map.addControl(new mapboxgl.NavigationControl(), 'top-left');
 
 
 </script>
