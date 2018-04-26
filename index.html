@@ -47,6 +47,12 @@
       border-width: 1px;
       border-color: #d8d8d8;
     }
+    .unselect {
+      -webkit-user-select: none;
+      -moz-user-select: -moz-none;
+      -ms-user-select: none;
+      user-select: none;
+    }
 </style>
 <div id='map'></div>
 <script>
@@ -229,7 +235,7 @@ SearchControl.prototype.onAdd = function(map) {
     this._map = map;
     this._container = document.createElement('div');
     this._container.innerHTML = `
-      <div class='search-bar-container'>
+      <div class='search-bar-container unselect'>
         <input placeholder='Hae' id='location-search'/>
         <div class='btn' onclick='search()'>Hae</div>
       </div>
