@@ -47,6 +47,12 @@
       border-width: 1px;
       border-color: #d8d8d8;
     }
+    .unselect {
+      -webkit-user-select: none;
+      -moz-user-select: -moz-none;
+      -ms-user-select: none;
+      user-select: none;
+    }
 </style>
 <div id='map'></div>
 <script>
@@ -74,13 +80,15 @@ const ROUTE_QUERY = `
   }`
 
 const STOP_QUERY = `
-  query StopQuery($stopId:String!) {
+  query StopQuery($stopId:String!, $date: Date!) {
     data: stopByStopId(
-      stopId: $stopId,
+      stopId: $stopId
     ) {
-      routes: routeSegmentsByStopId {
+      routes: routeSegmentsForDate(date: $date){
         nodes {
           routeId
+          dateBegin
+          dateEnd
         }
       }
     }
@@ -175,7 +183,20 @@ function renderFeature(feature) {
   return feature.routeId ? renderRoute(feature) : renderStop(feature)
 }
 
+function getFormattedDate() {
+    var d = new Date(),
+    month = '' + (d.getMonth() + 1),
+    day = '' + d.getDate(),
+    year = d.getFullYear();
+
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+
+    return [year, month, day].join('-');
+}
+
 function fetchData(feature) {
+  feature.date = getFormattedDate();
   return fetch(GRAPHQL_URL, {
     method: "POST",
     headers: {
@@ -229,7 +250,7 @@ SearchControl.prototype.onAdd = function(map) {
     this._map = map;
     this._container = document.createElement('div');
     this._container.innerHTML = `
-      <div class='search-bar-container'>
+      <div class='search-bar-container unselect'>
         <input placeholder='Hae' id='location-search'/>
         <div class='btn' onclick='search()'>Hae</div>
       </div>
