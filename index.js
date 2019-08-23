@@ -1,4 +1,4 @@
-const GRAPHQL_URL = process.env.GRAPHQL_URL;
+const GRAPHQL_URL = process.env.GRAPHQL_URL
 
 const ROUTE_QUERY = `
   query RouteQuery($direction:String!, $routeId: String!, $dateBegin: Date!, $dateEnd: Date!) {
@@ -35,8 +35,8 @@ const STOP_QUERY = `
     }
   }`
 
-const RAIL_ROUTE_ID_REGEXP = /^300[12]/;
-const SUBWAY_ROUTE_ID_REGEXP = /^31/;
+const RAIL_ROUTE_ID_REGEXP = /^300[12]/
+const SUBWAY_ROUTE_ID_REGEXP = /^31/
 
 /**
  * Returns whether a route id is a so called number variant
@@ -44,7 +44,7 @@ const SUBWAY_ROUTE_ID_REGEXP = /^31/;
  * @returns {boolean}
  */
 function isNumberVariant(routeId) {
-  return /.{5}[0-9]/.test(routeId);
+  return /.{5}[0-9]/.test(routeId)
 }
 
 /**
@@ -53,7 +53,7 @@ function isNumberVariant(routeId) {
  * @returns {boolean}
  */
 function isRailRoute(routeId) {
-  return RAIL_ROUTE_ID_REGEXP.test(routeId);
+  return RAIL_ROUTE_ID_REGEXP.test(routeId)
 }
 
 /**
@@ -62,7 +62,7 @@ function isRailRoute(routeId) {
  * @returns {boolean}
  */
 function isSubwayRoute(routeId) {
-  return SUBWAY_ROUTE_ID_REGEXP.test(routeId);
+  return SUBWAY_ROUTE_ID_REGEXP.test(routeId)
 }
 
 /**
@@ -71,35 +71,42 @@ function isSubwayRoute(routeId) {
  * @returns {String}
  */
 function trimRouteId(routeId) {
-  if( isRailRoute(routeId) && isNumberVariant(routeId) ) {
-    return routeId.substring(1, 5).replace(RAIL_ROUTE_ID_REGEXP, "");
-  } else if( isRailRoute(routeId) ) {
-    return routeId.replace(RAIL_ROUTE_ID_REGEXP, "");
-  } else if( isSubwayRoute(routeId) && isNumberVariant(routeId) ) {
-    return routeId.substring(1, 5).replace(SUBWAY_ROUTE_ID_REGEXP, "");
-  } else if( isSubwayRoute(routeId) ) {
-    return routeId.replace(SUBWAY_ROUTE_ID_REGEXP, "");
-  } else if( isNumberVariant(routeId) ) {
+  if (isRailRoute(routeId) && isNumberVariant(routeId)) {
+    return routeId.substring(1, 5).replace(RAIL_ROUTE_ID_REGEXP, "")
+  } else if (isRailRoute(routeId)) {
+    return routeId.replace(RAIL_ROUTE_ID_REGEXP, "")
+  } else if (isSubwayRoute(routeId) && isNumberVariant(routeId)) {
+    return routeId.substring(1, 5).replace(SUBWAY_ROUTE_ID_REGEXP, "")
+  } else if (isSubwayRoute(routeId)) {
+    return routeId.replace(SUBWAY_ROUTE_ID_REGEXP, "")
+  } else if (isNumberVariant(routeId)) {
     // Do not show number variants
-    return routeId.substring(1, 5).replace(/^[0]+/g, "");
+    return routeId.substring(1, 5).replace(/^[0]+/g, "")
   }
-  return routeId.substring(1).replace(/^[0]+/g, "");
+  return routeId.substring(1).replace(/^[0]+/g, "")
 }
 
 function renderRoute(route) {
-  const line = route.line.nodes[ 0 ]
-  
+  const line = _.get(route, "line.nodes[0]")
+
+  if (!line) {
+    return
+  }
+
   return `
     <div>
-      <a href="https://kartat.hsldev.com/kuljettaja/${ line.lineId }/${ line.dateBegin }/${ line.dateEnd }">
-        ${ trimRouteId(route.routeId) } ${ route.originFi } -> ${ route.destinationFi }
+      <a href="https://kartat.hsldev.com/kuljettaja/${line.lineId}/${line.dateBegin}/${
+    line.dateEnd
+  }">
+        ${trimRouteId(route.routeId)} ${route.originFi} -> ${route.destinationFi}
       </a>
     </div>`
 }
 
 function renderStop(stop) {
-  return `<div>${ stop.nameFi } (${ stop.shortId }) ${ stop.routes.nodes.map(node => trimRouteId(node.routeId))
-                                                           .join(" ") }</div>`
+  return `<div>${stop.nameFi} (${stop.shortId}) ${stop.routes.nodes
+    .map((node) => trimRouteId(node.routeId))
+    .join(" ")}</div>`
 }
 
 function renderFeature(feature) {
@@ -108,18 +115,18 @@ function renderFeature(feature) {
 
 function getFormattedDate() {
   var d = new Date(),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
-  
-  if( month.length < 2 ) month = '0' + month;
-  if( day.length < 2 ) day = '0' + day;
-  
-  return [ year, month, day ].join('-');
+    month = "" + (d.getMonth() + 1),
+    day = "" + d.getDate(),
+    year = d.getFullYear()
+
+  if (month.length < 2) month = "0" + month
+  if (day.length < 2) day = "0" + day
+
+  return [year, month, day].join("-")
 }
 
 function fetchData(feature) {
-  feature.date = getFormattedDate();
+  feature.date = getFormattedDate()
   return fetch(GRAPHQL_URL, {
     method: "POST",
     headers: {
@@ -132,109 +139,127 @@ function fetchData(feature) {
       variables: feature
     })
   })
-    .then(res => res.json())
-    .then(res => Object.assign({}, feature, res.data.data))
+    .then((res) => res.json())
+    .then((res) => Object.assign({}, feature, res.data.data))
 }
 
 const map = new mapboxgl.Map({
   container: "map",
-  center: [ 24.9384, 60.1699 ],
+  center: [24.9384, 60.1699],
   style: "style.json",
   zoom: 10
-});
+})
+
+var isFetching = false
 
 map.on("click", function(e) {
+  if (isFetching) {
+    return
+  }
+
+  const point = e.point
+  const sw = [point.x - 10, point.y + 10]
+  const ne = [point.x + 10, point.y - 10]
+
+  isFetching = true
+
   Promise.all(
     _.sortBy(
       _.uniqBy(
         map
-          .queryRenderedFeatures(e.point)
-          .filter(feature => [ "routes", "stops" ].includes(feature.layer.source))
-          .map(feature => feature.properties),
+          .queryRenderedFeatures([sw, ne])
+          .filter((feature) => ["routes", "stops"].includes(feature.layer.source))
+          .map((feature) => feature.properties),
         JSON.stringify
       ),
-      [ "stopId", "routeId", "direction" ]
+      ["stopId", "routeId", "direction"]
     ).map(fetchData)
-  ).then(features => {
+  ).then((features) => {
+    isFetching = false
+
+    if (!features || features.length === 0) {
+      return
+    }
+
     new mapboxgl.Popup()
       .setLngLat(e.lngLat)
-      .setHTML(
-        features
-          .map(renderFeature)
-          .join("")
-      )
-      .addTo(map);
-  });
-});
+      .setHTML(features.map(renderFeature).join(""))
+      .addTo(map)
+  })
+})
 
-function SearchControl() { }
+function SearchControl() {}
 
 SearchControl.prototype.onAdd = function(map) {
-  this._map = map;
-  this._container = document.createElement('div');
+  this._map = map
+  this._container = document.createElement("div")
   this._container.innerHTML = `
       <div class='search-bar-container unselect'>
         <input placeholder='Hae' id='location-search'/>
         <div class='btn' onclick='search()'>Hae</div>
       </div>
-    `;
-  return this._container;
-};
+    `
+  return this._container
+}
 
 SearchControl.prototype.onRemove = function() {
-  this._container.parentNode.removeChild(this._container);
-  this._map = undefined;
-};
+  this._container.parentNode.removeChild(this._container)
+  this._map = undefined
+}
 
-var markerList = [];
+var markerList = []
 
 function clearMarkers() {
-  for( var i = 0; i < markerList.length; i++ ) {
-    var marker = markerList[ i ];
-    marker.remove();
+  for (var i = 0; i < markerList.length; i++) {
+    var marker = markerList[i]
+    marker.remove()
   }
-  markerList.length = 0;
+  markerList.length = 0
 }
 
 function searchCallback(res) {
-  var result = JSON.parse(res);
-  if( result.features && result.features.length ) {
-    var coordinates = result.features[ 0 ].geometry.coordinates;
-    
-    map.setCenter(coordinates);
-    map.setZoom(15);
-    
-    clearMarkers();
-    markerList.push(new mapboxgl.Marker()
-      .setLngLat(coordinates)
-      .addTo(map));
+  var result = JSON.parse(res)
+  if (result.features && result.features.length) {
+    var coordinates = result.features[0].geometry.coordinates
+
+    map.setCenter(coordinates)
+    map.setZoom(15)
+
+    clearMarkers()
+    markerList.push(new mapboxgl.Marker().setLngLat(coordinates).addTo(map))
   } else {
-    alert('Hakusi ei tuottanut tuloksia');
+    alert("Hakusi ei tuottanut tuloksia")
   }
 }
 
-map.addControl(new SearchControl(), 'top-left');
+map.addControl(new SearchControl(), "top-left")
 
 function search() {
-  var val = document.getElementById('location-search').value;
-  if( val && val.length > 1 ) {
-    var xmlHttp = new XMLHttpRequest();
+  var val = document.getElementById("location-search").value
+  if (val && val.length > 1) {
+    var xmlHttp = new XMLHttpRequest()
     xmlHttp.onreadystatechange = function() {
-      if( xmlHttp.readyState == 4 && xmlHttp.status == 200 )
-        searchCallback(xmlHttp.responseText);
+      if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+        searchCallback(xmlHttp.responseText)
     }
-    var currentCenter = map.getCenter();
-    var url = "https://api.digitransit.fi/geocoding/v1/search?text=" + val + "&size=1&focus.point.lat=" + currentCenter.lat + "&focus.point.lon=" + currentCenter.lng;
-    xmlHttp.open("GET", encodeURI(url), true);
-    xmlHttp.send(null);
+    var currentCenter = map.getCenter()
+    var url =
+      "https://api.digitransit.fi/geocoding/v1/search?text=" +
+      val +
+      "&size=1&focus.point.lat=" +
+      currentCenter.lat +
+      "&focus.point.lon=" +
+      currentCenter.lng
+    xmlHttp.open("GET", encodeURI(url), true)
+    xmlHttp.send(null)
   }
 }
 
-var elem = document.getElementById('location-search');
-elem.addEventListener('keypress', function(e) {
-  if( e.keyCode == 13 ) {
-    search();
+var elem = document.getElementById("location-search")
+elem.addEventListener("keypress", function(e) {
+  if (e.keyCode == 13) {
+    search()
   }
-});
+})
 
-map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+map.addControl(new mapboxgl.NavigationControl(), "top-left")

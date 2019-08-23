@@ -1,11 +1,17 @@
-FROM node:carbon
+FROM node:lts-alpine
 
-WORKDIR /opt/mappoc
+ENV WORK /opt/mappoc
 
-COPY package*.json ./
+RUN mkdir -p ${WORK}
+WORKDIR ${WORK}
 
-RUN npm install
-COPY . .
+COPY package.json ${WORK}
+COPY yarn.lock ${WORK}
 
-EXPOSE 3000
-CMD [ "npm", "start" ]
+RUN yarn install
+COPY . ${WORK}
+
+ARG BUILD_ENV=production
+COPY .env.${BUILD_ENV} ${WORK}/.env
+
+CMD [ "yarn", "start" ]

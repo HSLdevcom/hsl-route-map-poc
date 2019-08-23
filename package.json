@@ -12,7 +12,9 @@
   "dependencies": {
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
-    "hsl-map-style": "github:hsldevcom/hsl-map-style",
-    "serve": "^11.1.0"
+    "hsl-map-style": "github:hsldevcom/hsl-map-style"
+  },
+  "devDependencies": {
+    "prettier": "^1.18.2"
   }
 }
