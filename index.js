@@ -1,3 +1,4 @@
+// The env var will be replaced in the server.js file.
 const GRAPHQL_URL = process.env.GRAPHQL_URL
 
 const ROUTE_QUERY = `
@@ -93,9 +94,10 @@ function renderRoute(route) {
     return
   }
 
+  // The env var will be replaced in the server.js file.
   return `
     <div>
-      <a href="https://kartat.hsldev.com/kuljettaja/${line.lineId}/${line.dateBegin}/${
+      <a href="${process.env.LINK_URL}/kuljettaja/${line.lineId}/${line.dateBegin}/${
     line.dateEnd
   }">
         ${trimRouteId(route.routeId)} ${route.originFi} -> ${route.destinationFi}
