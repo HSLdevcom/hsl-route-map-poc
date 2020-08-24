@@ -1,4 +1,5 @@
 // The env var will be replaced in the server.js file.
+
 const GRAPHQL_URL = process.env.GRAPHQL_URL
 
 const ROUTE_QUERY = `
@@ -97,9 +98,9 @@ function renderRoute(route) {
   // The env var will be replaced in the server.js file.
   return `
     <div>
-      <a href="${process.env.LINK_URL}/kuljettaja/${line.lineId}/${line.dateBegin}/${
-    line.dateEnd
-  }">
+      <a href="${process.env.LINK_URL}/kuljettaja/map/?${line.lineId}[dateBegin]=${
+    line.dateBegin
+  }&${line.lineId}[dateEnd]=${line.dateEnd}">
         ${trimRouteId(route.routeId)} ${route.originFi} -> ${route.destinationFi}
       </a>
     </div>`
@@ -159,6 +160,9 @@ map.on("click", function(e) {
     return
   }
 
+  const datepickerdiv = document.getElementById("datepicker").value
+  moment.locale("fi")
+  const momentDate = moment(datepickerdiv)
   const point = e.point
   const sw = [point.x - 10, point.y + 10]
   const ne = [point.x + 10, point.y - 10]
@@ -183,9 +187,18 @@ map.on("click", function(e) {
       return
     }
 
+    const filteredFeatures = features.filter((feature) => {
+      if (!momentDate.isValid()) {
+        return true
+      }
+      const dateBegin = moment(feature.dateBegin)
+      const dateEnd = moment(feature.dateEnd)
+      return dateBegin.isBefore(momentDate) && dateEnd.isAfter(momentDate)
+    })
+
     new mapboxgl.Popup()
       .setLngLat(e.lngLat)
-      .setHTML(features.map(renderFeature).join(""))
+      .setHTML(filteredFeatures.map(renderFeature).join(""))
       .addTo(map)
   })
 })
@@ -207,6 +220,20 @@ SearchControl.prototype.onAdd = function(map) {
 SearchControl.prototype.onRemove = function() {
   this._container.parentNode.removeChild(this._container)
   this._map = undefined
+}
+
+function DateControl() {}
+
+DateControl.prototype.onAdd = function(map) {
+  this._map = map
+  this._container = document.createElement("div")
+  this._container.innerHTML = `
+    <div class='search-bar-container unselect'>
+      <input readonly='true' id='datepicker'></input>
+      <div style="width:50px;" class='btn' onclick='emptyDate()'>Tyhjennä</div>
+    <div/>
+    `
+  return this._container
 }
 
 var markerList = []
@@ -235,6 +262,16 @@ function searchCallback(res) {
 }
 
 map.addControl(new SearchControl(), "top-left")
+map.addControl(new DateControl(), "top-left")
+datepicker("#datepicker", {
+  formatter: (input, date, instance) => {
+    const value = Date.parse(date)
+    const newDate = new Date(value)
+    input.value = `${newDate.getDate()}.${newDate.getMonth() + 1}.${newDate.getFullYear()}`
+  },
+  startDay: 1,
+  customDays: ["Su", "Ma", "Ti", "Ke", "To", "Pe", "La"]
+})
 
 function search() {
   var val = document.getElementById("location-search").value
@@ -255,6 +292,10 @@ function search() {
     xmlHttp.open("GET", encodeURI(url), true)
     xmlHttp.send(null)
   }
+}
+
+function emptyDate() {
+  document.getElementById("datepicker").value = ""
 }
 
 var elem = document.getElementById("location-search")

@@ -198,6 +198,11 @@ ipaddr.js@1.9.0:
   resolved "https://registry.yarnpkg.com/ipaddr.js/-/ipaddr.js-1.9.0.tgz#37df74e430a0e47550fe54a2defe30d8acd95f65"
   integrity sha512-M4Sjn6N/+O6/IXSJseKqHoFc+5FdGJ22sXqnjTpdZweHK64MzEPAyQZyEU3R/KRv2GLoa7nNtg/C2Ev6m7z+eA==
 
+js-datepicker@^5.14.1:
+  version "5.16.0"
+  resolved "https://registry.yarnpkg.com/js-datepicker/-/js-datepicker-5.16.0.tgz#1a4bcc01453a9f79700fba2866f091b55f27f766"
+  integrity sha512-PXS1YzaksNDj5VpaPg8iFn775L9eYM2b49MgoHqDfz51vjTTMowr3R/mgYSC7NeWFRyJiZJJ4oKrHaSe7tSk/g==
+
 lodash@^4.17.4:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"

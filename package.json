@@ -12,7 +12,8 @@
   "dependencies": {
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
-    "hsl-map-style": "github:hsldevcom/hsl-map-style"
+    "hsl-map-style": "github:hsldevcom/hsl-map-style",
+    "js-datepicker": "^5.14.1"
   },
   "devDependencies": {
     "prettier": "^1.18.2"

@@ -26,7 +26,7 @@ app.get("/index.js", function(req, res) {
   let js = fs.readFileSync("index.js", "utf8")
 
   for (const [name, value] of Object.entries(process.env)) {
-    js = js.replace(new RegExp(`(\${)*(process\.env\.${ name })(})*`, "gm"), `$1"${value}"$3`)
+    js = js.replace(new RegExp(`(\${)*(process\.env\.${name})(})*`, "gm"), `$1"${value}"$3`)
   }
 
   res.send(js)
