@@ -1,14 +1,13 @@
-FROM node:lts-alpine
+FROM node:16-alpine
 
 ENV WORK /opt/mappoc
 
 RUN mkdir -p ${WORK}
 WORKDIR ${WORK}
 
-COPY package.json ${WORK}
-COPY yarn.lock ${WORK}
+COPY package.json yarn.lock ${WORK}/
 
-RUN yarn install
+RUN yarn install && yarn cache clean
 COPY . ${WORK}
 
 ARG BUILD_ENV=production

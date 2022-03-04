@@ -149,9 +149,9 @@ fresh@0.5.2:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/fresh/-/fresh-0.5.2.tgz#3d8cadd90d976569fa835ab1f8e4b23a105605a7"
 
-hsl-map-style@hsldevcom/hsl-map-style#development:
+hsl-map-style@hsldevcom/hsl-map-style#master:
   version "1.0.0"
-  resolved "https://codeload.github.com/hsldevcom/hsl-map-style/tar.gz/ef38c997e5924789e39ab8d051a972a4b0224e5b"
+  resolved "https://codeload.github.com/hsldevcom/hsl-map-style/tar.gz/4dd7b543f94471474d4aa596ae6e370959e4736c"
   dependencies:
     lodash "^4.17.4"
 
