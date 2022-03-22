@@ -165,7 +165,7 @@ map.on("click", function(e) {
 
   const datepickerdiv = document.getElementById("datepicker").value
   moment.locale("fi")
-  const momentDate = moment(datepickerdiv)
+  const momentDate = moment(datepickerdiv, "L") // L means locale format, removes the warning of non-ISO date format
   const point = e.point
   const sw = [point.x - 10, point.y + 10]
   const ne = [point.x + 10, point.y - 10]
@@ -232,7 +232,7 @@ DateControl.prototype.onAdd = function(map) {
   this._container = document.createElement("div")
   this._container.innerHTML = `
     <div class='search-bar-container unselect'>
-      <input readonly='true' id='datepicker'></input>
+      <input readonly='true' placeholder='Päivämäärä' id='datepicker'></input>
       <div style="width:50px;" class='btn' onclick='emptyDate()'>Tyhjennä</div>
     <div/>
     `
@@ -260,6 +260,8 @@ function searchCallback(res) {
   var result = JSON.parse(res)
   if (result.features && result.features.length && checkConfidence(result.features[0])) {
     var coordinates = result.features[0].geometry.coordinates
+    // Place the exact result label to the search box
+    document.getElementById("location-search").value = result.features[0].properties.label
 
     map.setCenter(coordinates)
     map.setZoom(15)
