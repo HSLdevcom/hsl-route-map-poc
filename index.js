@@ -40,6 +40,9 @@ const STOP_QUERY = `
 const RAIL_ROUTE_ID_REGEXP = /^300[12]/
 const SUBWAY_ROUTE_ID_REGEXP = /^31/
 
+// The confidence level which the geocoding result have to get to show the result.
+const GEOCODE_CONFIDENCE_LIMIT = 0.99
+
 /**
  * Returns whether a route id is a so called number variant
  * @param {String} routeId - Route id
@@ -246,9 +249,16 @@ function clearMarkers() {
   markerList.length = 0
 }
 
+function checkConfidence(feature) {
+  if (feature.properties && feature.properties.confidence) {
+    return feature.properties.confidence >= GEOCODE_CONFIDENCE_LIMIT
+  }
+  return false;
+}
+
 function searchCallback(res) {
   var result = JSON.parse(res)
-  if (result.features && result.features.length) {
+  if (result.features && result.features.length && checkConfidence(result.features[0])) {
     var coordinates = result.features[0].geometry.coordinates
 
     map.setCenter(coordinates)
