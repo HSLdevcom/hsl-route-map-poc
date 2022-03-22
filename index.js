@@ -253,7 +253,7 @@ function checkConfidence(feature) {
   if (feature.properties && feature.properties.confidence) {
     return feature.properties.confidence >= GEOCODE_CONFIDENCE_LIMIT
   }
-  return false;
+  return false
 }
 
 function searchCallback(res) {
