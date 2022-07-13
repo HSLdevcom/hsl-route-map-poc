@@ -1,5 +1,4 @@
 // The env var will be replaced in the server.js file.
-
 const GRAPHQL_URL = process.env.GRAPHQL_URL
 
 const ROUTE_QUERY = `
@@ -149,10 +148,11 @@ function fetchData(feature) {
     .then((res) => Object.assign({}, feature, res.data.data))
 }
 
-const map = new mapboxgl.Map({
+const currentDate = moment().format("YYYY-MM-DD")
+let map = new mapboxgl.Map({
   container: "map",
   center: [24.9384, 60.1699],
-  style: "style.json",
+  style: `style.json/${currentDate}`,
   zoom: 10
 })
 
@@ -234,6 +234,7 @@ DateControl.prototype.onAdd = function(map) {
     <div class='search-bar-container unselect'>
       <input readonly='true' placeholder='Päivämäärä' id='datepicker'></input>
       <div style="width:50px;" class='btn' onclick='emptyDate()'>Tyhjennä</div>
+      <div style="width:50px;" class='btn' onclick='updateMap()' title="Päivittää kartan geometriat päivämäärän mukaan">Aseta</div>
     <div/>
     `
   return this._container
@@ -308,6 +309,18 @@ function search() {
 
 function emptyDate() {
   document.getElementById("datepicker").value = ""
+}
+
+function updateMap() {
+  const datepickerdiv = document.getElementById("datepicker").value
+  moment.locale("fi")
+  const momentDate = moment(datepickerdiv, "L").format("YYYY-MM-DD")
+  map = new mapboxgl.Map({
+    container: "map",
+    center: [24.9384, 60.1699],
+    style: `style.json/${momentDate}`,
+    zoom: 10
+  })
 }
 
 var elem = document.getElementById("location-search")
