@@ -1,18 +1,6 @@
 const fs = require("fs")
 const express = require("express")
 
-const style = require("hsl-map-style").generateStyle({
-  components: {
-    text_fisv: {enabled: true},
-    routes: {enabled: true},
-    stops: {enabled: true},
-    citybikes: {enabled: true},
-    icons: {enabled: true},
-    print: {enabled: false},
-    municipal_borders: {enabled: true}
-  }
-})
-
 const app = express()
 
 app.get("/", function(req, res) {
@@ -32,7 +20,20 @@ app.get("/index.js", function(req, res) {
   res.send(js)
 })
 
-app.get("/style.json", function(req, res) {
+app.get("/style.json/:date", function(req, res) {
+  const style = require("hsl-map-style").generateStyle({
+    components: {
+      text_fisv: {enabled: true},
+      routes: {enabled: true},
+      stops: {enabled: true},
+      citybikes: {enabled: true},
+      icons: {enabled: true},
+      print: {enabled: false},
+      municipal_borders: {enabled: true}
+    },
+    joreDate: req.params.date
+  })
+
   res.set("Content-Type", "application/json")
   res.send(style)
 })
