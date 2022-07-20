@@ -151,7 +151,7 @@ fresh@0.5.2:
 
 hsl-map-style@hsldevcom/hsl-map-style#master:
   version "1.0.0"
-  resolved "https://codeload.github.com/hsldevcom/hsl-map-style/tar.gz/4dd7b543f94471474d4aa596ae6e370959e4736c"
+  resolved "https://codeload.github.com/hsldevcom/hsl-map-style/tar.gz/c8edc1963dc1b7f33e644488c292ebb06b68b520"
   dependencies:
     lodash "^4.17.4"
 
