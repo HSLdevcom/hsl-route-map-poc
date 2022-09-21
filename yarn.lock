@@ -240,7 +240,7 @@ has-flag@^3.0.0:
 
 hsl-map-style@hsldevcom/hsl-map-style#master:
   version "1.0.0"
-  resolved "https://codeload.github.com/hsldevcom/hsl-map-style/tar.gz/56a86abaaf3bf72413b491ffa51cabb1aabb927b"
+  resolved "https://codeload.github.com/hsldevcom/hsl-map-style/tar.gz/b054723f9afb31b8acc1398808628194ddcfd832"
   dependencies:
     lodash "^4.17.4"
 
