@@ -1,6 +1,7 @@
 FROM node:16-alpine
 
 ENV WORK /opt/mappoc
+ENV NODE_ENV=production
 
 RUN mkdir -p ${WORK}
 WORKDIR ${WORK}
