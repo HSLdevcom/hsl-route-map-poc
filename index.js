@@ -1,5 +1,4 @@
 // The env var will be replaced in the server.js file.
-
 const GRAPHQL_URL = process.env.GRAPHQL_URL
 
 const ROUTE_QUERY = `
@@ -149,62 +148,66 @@ function fetchData(feature) {
     .then((res) => Object.assign({}, feature, res.data.data))
 }
 
-const map = new mapboxgl.Map({
+const currentDate = moment().format("YYYY-MM-DD")
+let map = new mapboxgl.Map({
   container: "map",
   center: [24.9384, 60.1699],
-  style: "style.json",
+  style: `style.json/${currentDate}`,
   zoom: 10
 })
 
 var isFetching = false
+setOnClickEvent()
 
-map.on("click", function(e) {
-  if (isFetching) {
-    return
-  }
-
-  const datepickerdiv = document.getElementById("datepicker").value
-  moment.locale("fi")
-  const momentDate = moment(datepickerdiv, "L") // L means locale format, removes the warning of non-ISO date format
-  const point = e.point
-  const sw = [point.x - 10, point.y + 10]
-  const ne = [point.x + 10, point.y - 10]
-
-  isFetching = true
-
-  Promise.all(
-    _.sortBy(
-      _.uniqBy(
-        map
-          .queryRenderedFeatures([sw, ne])
-          .filter((feature) => ["routes", "stops"].includes(feature.layer.source))
-          .map((feature) => feature.properties),
-        JSON.stringify
-      ),
-      ["stopId", "routeId", "direction"]
-    ).map(fetchData)
-  ).then((features) => {
-    isFetching = false
-
-    if (!features || features.length === 0) {
+function setOnClickEvent() {
+  map.on("click", function(e) {
+    if (isFetching) {
       return
     }
 
-    const filteredFeatures = features.filter((feature) => {
-      if (!momentDate.isValid()) {
-        return true
-      }
-      const dateBegin = moment(feature.dateBegin)
-      const dateEnd = moment(feature.dateEnd)
-      return dateBegin.isBefore(momentDate) && dateEnd.isAfter(momentDate)
-    })
+    const datepickerdiv = document.getElementById("datepicker").value
+    moment.locale("fi")
+    const momentDate = moment(datepickerdiv, "L") // L means locale format, removes the warning of non-ISO date format
+    const point = e.point
+    const sw = [point.x - 10, point.y + 10]
+    const ne = [point.x + 10, point.y - 10]
 
-    new mapboxgl.Popup()
-      .setLngLat(e.lngLat)
-      .setHTML(filteredFeatures.map(renderFeature).join(""))
-      .addTo(map)
+    isFetching = true
+
+    Promise.all(
+      _.sortBy(
+        _.uniqBy(
+          map
+            .queryRenderedFeatures([sw, ne])
+            .filter((feature) => ["routes", "stops"].includes(feature.layer.source))
+            .map((feature) => feature.properties),
+          JSON.stringify
+        ),
+        ["stopId", "routeId", "direction"]
+      ).map(fetchData)
+    ).then((features) => {
+      isFetching = false
+
+      if (!features || features.length === 0) {
+        return
+      }
+
+      const filteredFeatures = features.filter((feature) => {
+        if (!momentDate.isValid()) {
+          return true
+        }
+        const dateBegin = moment(feature.dateBegin)
+        const dateEnd = moment(feature.dateEnd)
+        return dateBegin.isBefore(momentDate) && dateEnd.isAfter(momentDate)
+      })
+
+      new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(filteredFeatures.map(renderFeature).join(""))
+        .addTo(map)
+    })
   })
-})
+}
 
 function SearchControl() {}
 
@@ -234,6 +237,7 @@ DateControl.prototype.onAdd = function(map) {
     <div class='search-bar-container unselect'>
       <input readonly='true' placeholder='Päivämäärä' id='datepicker'></input>
       <div style="width:50px;" class='btn' onclick='emptyDate()'>Tyhjennä</div>
+      <div style="width:50px;" class='btn' onclick='updateMap()' title="Päivittää kartan geometriat päivämäärän mukaan">Aseta</div>
     <div/>
     `
   return this._container
@@ -308,6 +312,19 @@ function search() {
 
 function emptyDate() {
   document.getElementById("datepicker").value = ""
+}
+
+function updateMap() {
+  const datepickerdiv = document.getElementById("datepicker").value
+  moment.locale("fi")
+  const momentDate = moment(datepickerdiv, "L").format("YYYY-MM-DD")
+  map = new mapboxgl.Map({
+    container: "map",
+    center: [24.9384, 60.1699],
+    style: `style.json/${momentDate}`,
+    zoom: 10
+  })
+  setOnClickEvent()
 }
 
 var elem = document.getElementById("location-search")
