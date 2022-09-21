@@ -3,6 +3,8 @@ const express = require("express")
 
 const app = express()
 
+!process.env.DIGITRANSIT_APIKEY && console.warn("Missing Digitransit apikey. The map might not work correctly.")
+
 app.get("/", function(req, res) {
   res.set("Content-Type", "text/html")
   const index = fs.readFileSync("index.html", "utf8")
@@ -22,6 +24,13 @@ app.get("/index.js", function(req, res) {
 
 app.get("/style.json/:date", function(req, res) {
   const style = require("hsl-map-style").generateStyle({
+    sourcesUrl: process.env.DIGITRANSIT_URL,
+    ...(process.env.DIGITRANSIT_APIKEY && { // Add parameter if apikey was given
+      queryParams: [{
+        url: process.env.DIGITRANSIT_URL,
+        name: "digitransit-subscription-key",
+        value: process.env.DIGITRANSIT_APIKEY,
+    }]}),
     components: {
       text_fisv: {enabled: true},
       routes: {enabled: true},
