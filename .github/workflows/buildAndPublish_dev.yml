@@ -26,11 +26,11 @@ jobs:
 
       - name: Get commit hash
         id: commit_hash
-        run: echo "::set-output name=hash::$(git rev-parse --short "$GITHUB_SHA")"
+        run: echo "hash=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_OUTPUT
 
       - name: Get image timestamp
         id: timestamp
-        run: echo "::set-output name=timestamp::$(date +'%Y-%m-%d')"
+        run: echo "timestamp=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
       - name: Build and push timestamped tag
         uses: docker/build-push-action@v2
