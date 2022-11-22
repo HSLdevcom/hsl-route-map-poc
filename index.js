@@ -1,5 +1,8 @@
 // The env var will be replaced in the server.js file.
 const GRAPHQL_URL = process.env.GRAPHQL_URL
+const LINK_URL = process.env.LINK_URL
+const DIGITRANSIT_URL = process.env.DIGITRANSIT_URL
+const DIGITRANSIT_APIKEY = process.env.DIGITRANSIT_APIKEY
 
 const ROUTE_QUERY = `
   query RouteQuery($direction:String!, $routeId: String!, $dateBegin: Date!, $dateEnd: Date!) {
@@ -100,7 +103,7 @@ function renderRoute(route) {
   // The env var will be replaced in the server.js file.
   return `
     <div>
-      <a href="${process.env.LINK_URL}/kuljettaja/map/?${line.lineId}[dateBegin]=${
+      <a href="${LINK_URL}/kuljettaja/map/?${line.lineId}[dateBegin]=${
     line.dateBegin
   }&${line.lineId}[dateEnd]=${line.dateEnd}">
         ${trimRouteId(route.routeId)} ${route.originFi} -> ${route.destinationFi}
@@ -299,13 +302,16 @@ function search() {
     }
     var currentCenter = map.getCenter()
     var url =
-      "https://api.digitransit.fi/geocoding/v1/search?text=" +
+      `${DIGITRANSIT_URL}/geocoding/v1/search?text=` +
       val +
       "&size=1&focus.point.lat=" +
       currentCenter.lat +
       "&focus.point.lon=" +
       currentCenter.lng
     xmlHttp.open("GET", encodeURI(url), true)
+    if (DIGITRANSIT_APIKEY) {
+      xmlHttp.setRequestHeader("digitransit-subscription-key", DIGITRANSIT_APIKEY)
+    }
     xmlHttp.send(null)
   }
 }

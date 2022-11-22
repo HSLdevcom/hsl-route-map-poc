@@ -1,7 +1,10 @@
 const fs = require("fs")
 const express = require("express")
+const env = require("./constants")
 
 const app = express()
+
+!env.DIGITRANSIT_APIKEY && console.warn("Missing Digitransit apikey. The map might not work correctly.")
 
 app.get("/", function(req, res) {
   res.set("Content-Type", "text/html")
@@ -13,7 +16,7 @@ app.get("/index.js", function(req, res) {
   res.set("Content-Type", "application/javascript")
   let js = fs.readFileSync("index.js", "utf8")
 
-  for (const [name, value] of Object.entries(process.env)) {
+  for (const [name, value] of Object.entries(env)) {
     js = js.replace(new RegExp(`(\${)*(process\.env\.${name})(})*`, "gm"), `$1"${value}"$3`)
   }
 
@@ -22,6 +25,13 @@ app.get("/index.js", function(req, res) {
 
 app.get("/style.json/:date", function(req, res) {
   const style = require("hsl-map-style").generateStyle({
+    sourcesUrl: env.DIGITRANSIT_URL,
+    ...(env.DIGITRANSIT_APIKEY && { // Add parameter if apikey was given
+      queryParams: [{
+        url: env.DIGITRANSIT_URL,
+        name: "digitransit-subscription-key",
+        value: env.DIGITRANSIT_APIKEY,
+    }]}),
     components: {
       text_fisv: {enabled: true},
       routes: {enabled: true},
@@ -38,7 +48,7 @@ app.get("/style.json/:date", function(req, res) {
   res.send(style)
 })
 
-const port = process.env.PORT || 3000
+const port = env.PORT || 3000
 
 app.listen(port, function() {
   console.log("Listening at localhost:3000")
