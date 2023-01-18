@@ -48,6 +48,10 @@ app.get("/style.json/:date", function(req, res) {
   res.send(style)
 })
 
+app.get("/health", (req, res) => {
+  res.sendStatus(200)
+})
+
 const port = env.PORT || 3000
 
 app.listen(port, function() {
