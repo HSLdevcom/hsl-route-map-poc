@@ -5,17 +5,19 @@
   "main": "server.js",
   "scripts": {
     "start": "node -r dotenv/config server",
+    "watch": "nodemon -r dotenv/config server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^8.1.0",
-    "express": "^4.17.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
     "hsl-map-style": "hsldevcom/hsl-map-style#master",
-    "js-datepicker": "^5.14.1"
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "prettier": "^1.18.2"
+    "nodemon": "^2.0.22",
+    "prettier": "^2.8.7"
   }
 }
