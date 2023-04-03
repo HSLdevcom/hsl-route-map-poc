@@ -302,7 +302,8 @@ function search() {
     }
     var currentCenter = map.getCenter()
     var url =
-      `${DIGITRANSIT_URL}/geocoding/v1/search?text=` +
+      // `${DIGITRANSIT_URL}geocoding/v1/search?text=` +
+      `${DIGITRANSIT_URL.replace('cdn', 'api')}geocoding/v1/search?text=` + // dirty fix to handle the problem in digitransit cdn returning old results
       val +
       "&size=1&focus.point.lat=" +
       currentCenter.lat +
