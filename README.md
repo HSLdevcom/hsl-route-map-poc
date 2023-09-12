@@ -5,7 +5,7 @@ This app is a pretty simple map application, that shows the routes of selected d
 ## Installation and development
 
 Requirements
-- node (v16 or newer preferred)
+- node (v18 or newer preferred)
 - yarn package manager
 
 Create your own apikey for Digitransit (https://portal-dev-api.digitransit.fi)
