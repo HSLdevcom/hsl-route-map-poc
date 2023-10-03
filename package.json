@@ -11,13 +11,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "hsl-map-style": "hsldevcom/hsl-map-style#master",
-    "lodash": "^4.17.21"
+    "hsl-map-style": "hsldevcom/hsl-map-style#master"
   },
   "devDependencies": {
-    "nodemon": "^2.0.22",
-    "prettier": "^2.8.7"
+    "nodemon": "^3.0.1",
+    "prettier": "^3.0.3"
   }
 }

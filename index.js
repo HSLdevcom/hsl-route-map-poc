@@ -152,7 +152,7 @@ function fetchData(feature) {
 }
 
 const currentDate = moment().format("YYYY-MM-DD")
-let map = new mapboxgl.Map({
+let map = new maplibregl.Map({
   container: "map",
   center: [24.9384, 60.1699],
   style: `style.json/${currentDate}`,
@@ -204,7 +204,7 @@ function setOnClickEvent() {
         return dateBegin.isBefore(momentDate) && dateEnd.isAfter(momentDate)
       })
 
-      new mapboxgl.Popup()
+      new maplibregl.Popup()
         .setLngLat(e.lngLat)
         .setHTML(filteredFeatures.map(renderFeature).join(""))
         .addTo(map)
@@ -274,7 +274,7 @@ function searchCallback(res) {
     map.setZoom(15)
 
     clearMarkers()
-    markerList.push(new mapboxgl.Marker().setLngLat(coordinates).addTo(map))
+    markerList.push(new maplibregl.Marker().setLngLat(coordinates).addTo(map))
   } else {
     alert("Hakusi ei tuottanut tuloksia")
   }
@@ -325,7 +325,7 @@ function updateMap() {
   const datepickerdiv = document.getElementById("datepicker").value
   moment.locale("fi")
   const momentDate = moment(datepickerdiv, "L").format("YYYY-MM-DD")
-  map = new mapboxgl.Map({
+  map = new maplibregl.Map({
     container: "map",
     center: [24.9384, 60.1699],
     style: `style.json/${momentDate}`,
@@ -341,4 +341,4 @@ elem.addEventListener("keypress", function(e) {
   }
 })
 
-map.addControl(new mapboxgl.NavigationControl(), "top-left")
+map.addControl(new maplibregl.NavigationControl(), "top-left")
