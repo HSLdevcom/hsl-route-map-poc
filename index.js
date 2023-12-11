@@ -158,6 +158,12 @@ let map = new maplibregl.Map({
   style: `style.json/${currentDate}`,
   zoom: 10
 })
+let scale = new maplibregl.ScaleControl({
+  maxWidth: 300,
+  unit: 'metric'
+});
+
+map.addControl(scale);
 
 var isFetching = false
 setOnClickEvent()
