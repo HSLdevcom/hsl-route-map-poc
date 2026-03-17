@@ -15,6 +15,12 @@
     "express": "^4.18.2",
     "hsl-map-style": "hsldevcom/hsl-map-style#master"
   },
+  "resolutions": {
+    "body-parser": "1.20.3",
+    "path-to-regexp": "0.1.12",
+    "braces": "3.0.3",
+    "minimatch": "3.1.4"
+  },
   "devDependencies": {
     "nodemon": "^3.0.1",
     "prettier": "^3.0.3"
