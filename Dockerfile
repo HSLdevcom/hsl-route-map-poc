@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:22-alpine
 
 ENV WORK /opt/mappoc
 ENV NODE_ENV=production
