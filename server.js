@@ -1,8 +1,22 @@
 const fs = require("fs")
+const path = require("path")
 const express = require("express")
 const env = require("./constants")
 
 const app = express()
+
+// Browser libraries are installed from npm and served from here, so the page
+// does not depend on third-party CDNs being up.
+const packageDir = (name) => path.dirname(require.resolve(`${name}/package.json`))
+const vendor = {
+  "maplibre-gl": "dist",
+  lodash: "",
+  "js-datepicker": "dist",
+  moment: "min",
+}
+for (const [name, subdir] of Object.entries(vendor)) {
+  app.use(`/vendor/${name}`, express.static(path.join(packageDir(name), subdir)))
+}
 
 !env.DIGITRANSIT_APIKEY && console.warn("Missing Digitransit apikey. The map might not work correctly.")
 
